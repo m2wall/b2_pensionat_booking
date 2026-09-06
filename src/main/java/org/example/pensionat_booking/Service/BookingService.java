@@ -140,20 +140,17 @@ public class BookingService {
         for (Booking booking : bookings) {
             boolean noConflict = booking.getEndDate().isBefore(requestedStartDate) || booking.getStartDate().isAfter(requestedEndDate);
 
-            if (noConflict) {
-
-            } else {
-                if (currentBooking.getRoom().getId() == booking.getRoom().getId()) {
-                    available = false;
-                }
+            if (!noConflict && currentBooking.getRoom().getId() == booking.getRoom().getId()) {
+                available = false;
             }
         }
-        if (available) {
-            currentBooking.setStartDate(requestedStartDate);
-            currentBooking.setEndDate(requestedEndDate);
+        if (!available) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Valt rum ej ledigt under önskad period.");
         }
-        bookingRepo.save(currentBooking);
 
+        currentBooking.setStartDate(requestedStartDate);
+        currentBooking.setEndDate(requestedEndDate);
+        bookingRepo.save(currentBooking);
         return BookingToBookingDTO(currentBooking);
     }
 
@@ -181,7 +178,7 @@ public class BookingService {
         LocalDate requestedEndDate = LocalDate.parse(endDate);
 
         if (requestedEndDate.isBefore(requestedStartDate)) {
-            throw new RuntimeException("Slutdatum kan inte vara innan startdatum.");
+            throw new RoomNotAvailableException("Slutdatum kan inte vara innan startdatum.");
         }
 
         editedBooking.setStartDate(requestedStartDate);
@@ -217,6 +214,10 @@ public class BookingService {
     public boolean customerHasBookings(Long customerId) {
         return bookingRepo.existsByCustomerId(customerId);
     }
+}
 
-
+class RoomNotAvailableException extends RuntimeException {
+    public RoomNotAvailableException(String message) {
+        super(message);
+    }
 }

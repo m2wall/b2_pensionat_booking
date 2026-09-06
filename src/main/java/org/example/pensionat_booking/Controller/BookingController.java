@@ -79,9 +79,13 @@ public class BookingController {
     }
 
     @PutMapping("/{id}")
-    public BookingDTO editBooking(@PathVariable Long id, @PathVariable String
-            startDate, @PathVariable String endDate) {
-        return bookingService.editBooking(id, startDate, endDate);
+    public ResponseEntity<?> editBooking(@PathVariable Long id, @RequestParam String
+            startDate, @RequestParam String endDate) {
+        try {
+            return ResponseEntity.ok(bookingService.editBooking(id, startDate, endDate));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 
     @GetMapping("/customer/{customerId}/exists")
@@ -89,3 +93,5 @@ public class BookingController {
         return bookingService.customerHasBookings(customerId);
     }
 }
+
+
