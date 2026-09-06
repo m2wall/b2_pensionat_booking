@@ -209,8 +209,8 @@ public class BookingService {
         return false;
     }
 
-    public boolean customerHasBookings(Long customerId) {
-        return bookingRepo.existsByCustomerId(customerId);
-    }
+//    public boolean customerHasBookings(Long customerId) {
+//        return bookingRepo.existsByCustomerId(customerId);
+//    }
 }
 

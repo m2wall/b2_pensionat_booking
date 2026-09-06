@@ -1,14 +1,10 @@
 package org.example.pensionat_booking.Controller;
 
-import org.apache.coyote.Response;
 import org.example.pensionat_booking.DTO.BookingDTO;
-import org.example.pensionat_booking.DTO.RoomDTO;
 import org.example.pensionat_booking.Exception.RoomNotAvailableException;
-import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Service.BookingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.http.HttpStatus;
@@ -90,11 +86,11 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("En konflikt har inträffat.");
         }
     }
-
-    @GetMapping("/customer/{customerId}/exists")
-    public boolean customerHasBookings(@PathVariable Long customerId) {
-        return bookingService.customerHasBookings(customerId);
-    }
+//
+//    @GetMapping("/customer/{customerId}/exists")
+//    public boolean customerHasBookings(@PathVariable Long customerId) {
+//        return bookingService.customerHasBookings(customerId);
+//    }
 }
 
 
