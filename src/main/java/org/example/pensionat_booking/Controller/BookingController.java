@@ -86,6 +86,8 @@ public class BookingController {
             return ResponseEntity.ok(bookingService.editBooking(id, startDate, endDate));
         } catch (RoomNotAvailableException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("En konflikt har inträffat.");
         }
     }
 
