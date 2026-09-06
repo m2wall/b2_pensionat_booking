@@ -1,5 +1,6 @@
 package org.example.pensionat_booking.Service;
 
+import com.sun.net.httpserver.HttpsConfigurator;
 import org.example.pensionat_booking.DTO.BookingDTO;
 import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.DTO.RoomDTO;
@@ -10,6 +11,7 @@ import org.example.pensionat_booking.Repository.RoomRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -124,6 +126,10 @@ public class BookingService {
         }
 
         boolean available = true;
+
+        if (!bookingRepo.findById(bookingID).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ingen bokning hittades.");
+        }
 
         List<Booking> bookings = bookingRepo.findAll();
 

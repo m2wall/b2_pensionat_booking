@@ -79,9 +79,9 @@ public class BookingController {
     }
 
     @PutMapping("/{id}")
-    public BookingDTO editBooking(@PathVariable Long bookingID, @PathVariable String
+    public BookingDTO editBooking(@PathVariable Long id, @PathVariable String
             startDate, @PathVariable String endDate) {
-        return bookingService.editBooking(bookingID, startDate, endDate);
+        return bookingService.editBooking(id, startDate, endDate);
     }
 
     @GetMapping("/customer/{customerId}/exists")
