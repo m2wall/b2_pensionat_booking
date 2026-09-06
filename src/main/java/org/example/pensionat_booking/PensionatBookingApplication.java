@@ -1,7 +1,6 @@
 package org.example.pensionat_booking;
 
 import org.example.pensionat_booking.Model.Booking;
-import org.example.pensionat_booking.Model.Customer;
 import org.example.pensionat_booking.Model.Room;
 import org.example.pensionat_booking.Repository.BookingRepository;
 import org.example.pensionat_booking.Repository.RoomRepository;
@@ -31,14 +30,14 @@ public class PensionatBookingApplication {
 
             Room r1 = roomRepo.save(new Room("A1", true));
             Room r2 = roomRepo.save(new Room("A2", true));
-            Room r3 = roomRepo.save(new Room("B3", true));
-            Room r4 = roomRepo.save(new Room("B4", true));
-            Room r5 = roomRepo.save(new Room("C5", true));
-            Room r6 = roomRepo.save(new Room("C6", false));
-            Room r7 = roomRepo.save(new Room("D7", false));
-            Room r8 = roomRepo.save(new Room("D8", false));
-            Room r9 = roomRepo.save(new Room("E9", false));
-            Room r10 = roomRepo.save(new Room("E10", false));
+            Room r3 = roomRepo.save(new Room("A3", true));
+            Room r4 = roomRepo.save(new Room("A4", true));
+            Room r5 = roomRepo.save(new Room("A5", true));
+            Room r6 = roomRepo.save(new Room("B6", false));
+            Room r7 = roomRepo.save(new Room("B7", false));
+            Room r8 = roomRepo.save(new Room("B8", false));
+            Room r9 = roomRepo.save(new Room("B9", false));
+            Room r10 = roomRepo.save(new Room("B10", false));
 
 
             bookingRepo.save(new Booking(r1, 1L, d1, d2));
