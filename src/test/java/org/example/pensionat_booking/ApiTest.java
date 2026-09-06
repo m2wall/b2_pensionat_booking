@@ -1,21 +1,32 @@
 package org.example.pensionat_booking;
 
 
+import jakarta.validation.Valid;
+import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Model.Room;
 import org.example.pensionat_booking.Repository.BookingRepository;
 import org.example.pensionat_booking.Repository.RoomRepository;
 import org.example.pensionat_booking.Service.BookingService;
+import org.example.pensionat_booking.Service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,6 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ApiTest extends MySQLTestContainer {
     @Autowired
     MockMvc mvc;
+
+    @MockitoBean
+    CustomerService customerService;
 
     @Autowired
     private BookingRepository bookingRepo;
@@ -55,20 +69,70 @@ public class ApiTest extends MySQLTestContainer {
         Room r10 = roomRepo.save(new Room("E10", false));
 
 
-        bookingRepo.save(new Booking(r1, 1L, d1, d2));
-        bookingRepo.save(new Booking(r4, 2L, d3, d4));
-        bookingRepo.save(new Booking(r8, 3L, d5, d6));
+        Booking book1 = bookingRepo.save(new Booking(r1, 1L, d1, d2));
+        Booking book2 = bookingRepo.save(new Booking(r4, 2L, d3, d4));
+        Booking book3 = bookingRepo.save(new Booking(r8, 3L, d5, d6));
+
+        System.out.println(book1.getId() + " " + book2.getId() + " " + book3.getId());
 
 
     }
 
     @Test
     void getAllBookings() throws Exception {
+
+        bookingRepo.findAll().forEach(r -> System.out.println(r.getId()));
+
+
         mvc.perform(get("/api/bookings"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(3));
     }
+
+    @Test
+    void deleteBooking() throws Exception {
+
+        Booking deleteBooking = bookingRepo.findAll().stream().findFirst().orElse(null);
+
+        mvc.perform(delete("/api/bookings/" + deleteBooking.getId()))
+                .andExpect(status().isOk());
+
+        mvc.perform(delete("/api/bookings/" + deleteBooking.getId()))
+                .andExpect(status().isNotFound());
+
+        mvc.perform(get("/api/bookings"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2));
+
+    }
+
+
+
+
+    @Test
+    void createAndGetCustomer() throws Exception {
+        when(customerService.registerCustomer(any()))
+                .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(new CustomerDTO(1L, "Testman", "test@email.com", "076076")));
+
+        mvc.perform(post("/api/customers/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Testman\",\"email\":\"test@email.com\",\"phone\":\"076076\"}"))
+                .andExpect(status().isCreated());
+    }
+
+
+
+//    @Test
+//    void createCustomer() throws Exception {
+//
+//        CustomerDTO testCst = new CustomerDTO(1L, "Test", "Test@email.com", "4444");
+//        mvc.perform(post("/api/customers/register", testCst, CustomerDTO.class));
+//
+//        mvc.perform(get("/api/customers/1"))
+//                .andExpect(status().isOk());
+//    }
 
 
 }

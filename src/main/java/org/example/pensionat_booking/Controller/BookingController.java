@@ -51,7 +51,7 @@ public class BookingController {
         log.info("DELETE request to delete booking");
         try {
             bookingService.removeBooking(bookingID);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().build();
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).build();
         } catch (DataIntegrityViolationException e) {
