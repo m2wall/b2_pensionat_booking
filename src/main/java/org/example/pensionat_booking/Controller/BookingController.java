@@ -3,6 +3,7 @@ package org.example.pensionat_booking.Controller;
 import org.apache.coyote.Response;
 import org.example.pensionat_booking.DTO.BookingDTO;
 import org.example.pensionat_booking.DTO.RoomDTO;
+import org.example.pensionat_booking.Exception.RoomNotAvailableException;
 import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Service.BookingService;
 import org.slf4j.Logger;
@@ -83,8 +84,8 @@ public class BookingController {
             startDate, @RequestParam String endDate) {
         try {
             return ResponseEntity.ok(bookingService.editBooking(id, startDate, endDate));
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (RoomNotAvailableException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
 
