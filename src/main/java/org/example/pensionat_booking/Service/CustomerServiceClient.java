@@ -3,6 +3,7 @@ package org.example.pensionat_booking.Service;
 import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Repository.BookingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -18,6 +19,7 @@ import java.util.List;
 @Service
 public class CustomerServiceClient {
     private final BookingRepository bookingRepo;
+
     private final RestTemplate restTemplate;
     String baseUrl;
 
