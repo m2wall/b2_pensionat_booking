@@ -3,7 +3,7 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: pensionat_db
+      MYSQL_DATABASE: pensionat_booking
       MYSQL_USER: booking_user
       MYSQL_PASSWORD: booking_password
 
@@ -12,10 +12,17 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: pensionat_db
+      MYSQL_DATABASE: pensionat_customer
       MYSQL_USER: customer_user
       MYSQL_PASSWORD: customer_password
 
+  review-db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: pensionat_reviews
+      MYSQL_USER: reviews_user
+      MYSQL_PASSWORD: reviews_password
 
   booking-service:
     build: .
@@ -34,3 +41,12 @@ services:
       - "8081:8081"
     depends_on:
       - booking-db
+      -
+  review-service:
+    build: ../b2_pensionat_reviews
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8082:8082"
+    depends_on:
+      - reviews-db
