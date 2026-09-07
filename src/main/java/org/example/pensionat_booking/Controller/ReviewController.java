@@ -1,12 +1,11 @@
 package org.example.pensionat_booking.Controller;
 
+import org.example.pensionat_booking.DTO.ReviewRequestDTO;
 import org.example.pensionat_booking.DTO.ReviewResponseDTO;
 import org.example.pensionat_booking.Service.ReviewServiceClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,12 +21,19 @@ public class ReviewController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ReviewResponseDTO>> getAllReviews() {
+    public ResponseEntity<?> getAllReviews() {
         try {
             List<ReviewResponseDTO> reviews = reviewServiceClient.getAllReviews();
             return ResponseEntity.ok(reviews);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    @PostMapping()
+    public ResponseEntity<ReviewResponseDTO> creatReview(@RequestBody ReviewRequestDTO requestDTO){
+        return ResponseEntity.ok(reviewServiceClient.createReview(requestDTO));
     }
 }

@@ -1,6 +1,7 @@
 package org.example.pensionat_booking.Service;
 
 import org.example.pensionat_booking.DTO.BookingDTO;
+import org.example.pensionat_booking.DTO.BookingResponseDTO;
 import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.DTO.RoomDTO;
 import org.example.pensionat_booking.Exception.RoomNotAvailableException;
@@ -10,6 +11,7 @@ import org.example.pensionat_booking.Repository.BookingRepository;
 import org.example.pensionat_booking.Repository.RoomRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,7 +19,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -33,12 +37,43 @@ public class BookingService {
         this.customerServiceClient = customerServiceClient;
     }
 
-    public List<BookingDTO> getAllBookings() {
-        return bookingRepo.findAll().stream().map(b -> BookingToBookingDTO(b)).toList();
+    public List<BookingResponseDTO> getAllBookings() {
+
+        Map<Long, String> customerName;
+
+        List<Booking> bookings = bookingRepo.findAll();
+        List<Long> customerIds = bookings.stream().map(b -> b.getCustomerId()).distinct().toList();
+
+        try {
+            customerName = customerIds.stream().collect(Collectors.toMap(id -> id, id -> customerServiceClient.getCustomerNameById(id)));
+
+        }catch (RuntimeException e){
+            throw new RuntimeException(e.getMessage());
+        }
+        return bookings.stream().
+                        map(b -> new BookingResponseDTO(
+                                b.getId(),
+                                b.getRoom(),
+                                b.getStartDate(),
+                                b.getEndDate(),
+                                b.getRoom().isDoubleRoom(),
+                                b.getCustomerId(),
+                                customerName.get(b.getCustomerId()),
+                                b.getExtraBeds())).toList();
     }
 
     public BookingDTO BookingToBookingDTO(Booking b) {
-        return BookingDTO.builder().id(b.getId()).room(new Room(b.getRoom().getId(), b.getRoom().getNr(), b.getRoom().isDoubleRoom())).customerId(b.getCustomerId()).startDate(b.getStartDate().toString()).endDate(b.getEndDate().toString()).extraBeds(b.getExtraBeds()).build();
+        return BookingDTO.builder()
+                .id(b.getId())
+                .room(new Room(
+                        b.getRoom().getId(),
+                        b.getRoom().getNr(),
+                        b.getRoom().isDoubleRoom()))
+                .customerId(b.getCustomerId())
+                .startDate(b.getStartDate().toString())
+                .endDate(b.getEndDate().toString())
+                .extraBeds(b.getExtraBeds())
+                .build();
     }
 
     public List<RoomDTO> canBook(String startDate, String endDate, boolean doubleRoom) {
