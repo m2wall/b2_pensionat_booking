@@ -25,7 +25,6 @@ public class BookingService {
     private final BookingRepository bookingRepo;
     private final RoomRepository roomRepo;
     private final CustomerServiceClient customerServiceClient;
-    RestTemplate restTemplate = new RestTemplate();
 
 
     public BookingService(BookingRepository bookingRepo, RoomRepository roomRepo, CustomerServiceClient customerServiceClient) {
