@@ -24,4 +24,5 @@ public class BookingDTO {
     private String startDate;
     private String endDate;
     private int extraBeds;
+    private String customerName;
 }

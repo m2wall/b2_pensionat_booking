@@ -1,6 +1,7 @@
 package org.example.pensionat_booking.Controller;
 
 import org.example.pensionat_booking.DTO.BookingDTO;
+import org.example.pensionat_booking.DTO.BookingResponseDTO;
 import org.example.pensionat_booking.Exception.RoomNotAvailableException;
 import org.example.pensionat_booking.Service.BookingService;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.dao.QueryTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -27,11 +29,16 @@ public class BookingController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<BookingDTO>> getAllBookings() {
+    public ResponseEntity<List<BookingResponseDTO>> getAllBookings() {
         try {
             return ResponseEntity.ok(bookingService.getAllBookings());
+        } catch (HttpClientErrorException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Något gick fel.");
         } catch (QueryTimeoutException e) {
             return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).build();
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

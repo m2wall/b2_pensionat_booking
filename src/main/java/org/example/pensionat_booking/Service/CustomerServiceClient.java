@@ -3,7 +3,6 @@ package org.example.pensionat_booking.Service;
 import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Repository.BookingRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -70,17 +69,38 @@ public class CustomerServiceClient {
     public ResponseEntity<CustomerDTO> getCustomerById(Long id) {
 
         CustomerDTO customerByID = new CustomerDTO();
+
         try {
-            restTemplate.getForEntity(baseUrl + "/customers/{id}", CustomerDTO.class, id);
+            customerByID = restTemplate.getForObject(baseUrl + "/customers/{id}", CustomerDTO.class, id);
         } catch (HttpClientErrorException.NotFound e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(customerByID);
         } catch (HttpClientErrorException.BadRequest e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(customerByID);
         } catch (Exception e) {
-            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        customerByID = restTemplate.getForObject(baseUrl + "/customers/{id}", CustomerDTO.class, id);
         return ResponseEntity.status(HttpStatus.OK).body(customerByID);
+    }
+
+    public String getCustomerNameById(Long id) {
+
+        new CustomerDTO();
+        CustomerDTO customer;
+
+        try {
+            customer = restTemplate.getForObject(baseUrl + "/customers/{id}", CustomerDTO.class, id);
+            if (customer.getName() == null || customer.getName().equals("")) {
+                return ":(";
+            }
+
+        } catch (HttpClientErrorException.NotFound e) {
+            return "Kund hittades ej.";
+        } catch (HttpClientErrorException.BadRequest e) {
+           return "Inte tillgängligt.";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return customer.getName();
     }
 
     public ResponseEntity<CustomerDTO> editById(CustomerDTO editedCustomer) {
