@@ -35,10 +35,13 @@ public class CustomerController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<CustomerDTO> registerCustomers(@Valid @RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<?> registerCustomers(@Valid @RequestBody CustomerDTO customerDTO) {
         log.info("POST request to register customer");
-        log.info("Customer {} registered successfully", customerDTO.getName());
-        return service.registerCustomer(customerDTO);
+        try {
+            return service.registerCustomer(customerDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/delete/{id}")
@@ -47,7 +50,7 @@ public class CustomerController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity <CustomerDTO> editCustomer(@RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<CustomerDTO> editCustomer(@RequestBody CustomerDTO customerDTO) {
         return service.editById(customerDTO);
     }
 

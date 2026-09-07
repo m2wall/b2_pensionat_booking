@@ -19,7 +19,7 @@ import java.util.List;
 public class CustomerService {
 
     private final BookingRepository bookingRepo;
-    RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate();
     String baseUrl;
 
     public CustomerService(BookingRepository bookingRepo, @Value("${customer-service.base-url}") String baseUrl) {
@@ -40,11 +40,10 @@ public class CustomerService {
     public ResponseEntity<CustomerDTO> registerCustomer(CustomerDTO inputCustomer) {
 
         CustomerDTO savedCst = new CustomerDTO();
-        try{
-            savedCst = restTemplate.postForObject(baseUrl + "/customers/register", inputCustomer, CustomerDTO.class);
+        try {
+            savedCst = restTemplate.postForObject(baseUrl + "/customers/registe", inputCustomer, CustomerDTO.class);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedCst);
-        }
-        catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(savedCst);
         }
     }
@@ -69,19 +68,17 @@ public class CustomerService {
         CustomerDTO customerByID = new CustomerDTO();
         try {
             restTemplate.getForEntity(baseUrl + "/customers/{id}", CustomerDTO.class, id);
-        }
-        catch (HttpClientErrorException.NotFound e){
+        } catch (HttpClientErrorException.NotFound e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(customerByID);
-        }
-        catch (HttpClientErrorException.BadRequest e){
+        } catch (HttpClientErrorException.BadRequest e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(customerByID);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         customerByID = restTemplate.getForObject(baseUrl + "/customers/{id}", CustomerDTO.class, id);
         return ResponseEntity.status(HttpStatus.OK).body(customerByID);
     }
+
     public ResponseEntity<CustomerDTO> editById(CustomerDTO editedCustomer) {
 
         try {
@@ -92,9 +89,9 @@ public class CustomerService {
             ).getBody();
             return ResponseEntity.status(HttpStatus.OK).body(editedCst);
 
-        } catch (HttpClientErrorException.NotFound e){
+        } catch (HttpClientErrorException.NotFound e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } catch (HttpClientErrorException.BadRequest e){
+        } catch (HttpClientErrorException.BadRequest e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }

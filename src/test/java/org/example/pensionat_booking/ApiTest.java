@@ -1,31 +1,32 @@
 package org.example.pensionat_booking;
 
 
-import jakarta.validation.Valid;
 import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Model.Room;
 import org.example.pensionat_booking.Repository.BookingRepository;
 import org.example.pensionat_booking.Repository.RoomRepository;
-import org.example.pensionat_booking.Service.BookingService;
 import org.example.pensionat_booking.Service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,8 +46,13 @@ public class ApiTest extends MySQLTestContainer {
     @Autowired
     private RoomRepository roomRepo;
 
+    @Value("${customer-service.base-url}")
+    String baseUrl;
+
     @BeforeEach
     void setUp() {
+
+
         bookingRepo.deleteAll();
         roomRepo.deleteAll();
 
@@ -109,8 +115,6 @@ public class ApiTest extends MySQLTestContainer {
     }
 
 
-
-
     @Test
     void createAndGetCustomer() throws Exception {
         when(customerService.registerCustomer(any()))
@@ -122,6 +126,24 @@ public class ApiTest extends MySQLTestContainer {
                 .andExpect(status().isCreated());
     }
 
+    @Test
+    void createAndGetCustomer2() throws Exception {
+
+        RestTemplate rest = new RestTemplate();
+        MockRestServiceServer server = MockRestServiceServer.createServer(rest);
+
+        server.expect(requestTo(baseUrl + "/customers/register"))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .body("{\"id\": 1, \"name\": \"Testman2\", \"email\": \"test@email.com\", \"phone\": 076076}")
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
+
+        mvc.perform(post("/api/customers/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Testman\",\"email\":\"test@email.com\",\"phone\":\"076076\"}"))
+                .andExpect(status().isCreated());
+    }
 
 
 //    @Test
