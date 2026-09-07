@@ -16,7 +16,7 @@ services:
       MYSQL_USER: customer_user
       MYSQL_PASSWORD: customer_password
 
-  review-db:
+  reviews-db:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: password
