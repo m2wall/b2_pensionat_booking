@@ -41,7 +41,7 @@ services:
       - "8081:8081"
     depends_on:
       - booking-db
-      -
+
   review-service:
     build: ../b2_pensionat_reviews
     environment:
