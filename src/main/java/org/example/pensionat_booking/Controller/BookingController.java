@@ -67,7 +67,7 @@ public class BookingController {
                                                @RequestParam(defaultValue = "0") int extraBeds) {
         try {
             BookingDTO bookingDTO = bookingService.createBooking(startDate, endDate, isDoubleRoom, customerId, extraBeds);
-            return ResponseEntity.ok(bookingDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(bookingDTO);
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (QueryTimeoutException e) {
