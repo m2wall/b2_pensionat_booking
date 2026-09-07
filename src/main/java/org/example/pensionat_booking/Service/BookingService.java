@@ -24,14 +24,14 @@ public class BookingService {
 
     private final BookingRepository bookingRepo;
     private final RoomRepository roomRepo;
-    private final CustomerService customerService;
+    private final CustomerServiceClient customerServiceClient;
     RestTemplate restTemplate = new RestTemplate();
 
 
-    public BookingService(BookingRepository bookingRepo, RoomRepository roomRepo, CustomerService customerService) {
+    public BookingService(BookingRepository bookingRepo, RoomRepository roomRepo, CustomerServiceClient customerServiceClient) {
         this.bookingRepo = bookingRepo;
         this.roomRepo = roomRepo;
-        this.customerService = customerService;
+        this.customerServiceClient = customerServiceClient;
     }
 
     public List<BookingDTO> getAllBookings() {
@@ -103,7 +103,7 @@ public class BookingService {
         }
 
         Room room = roomRepo.findById(availableRooms.getFirst().getId()).orElse(null);
-        CustomerDTO currentCustomer = customerService.getCustomerById(customerId).getBody();
+        CustomerDTO currentCustomer = customerServiceClient.getCustomerById(customerId).getBody();
 
         Booking currentBooking = new Booking(room, currentCustomer.getId(), requestedStartDate, requestedEndDate);
         currentBooking.setExtraBeds(extraBeds);

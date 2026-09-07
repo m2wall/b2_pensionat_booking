@@ -2,12 +2,12 @@ package org.example.pensionat_booking.Controller;
 
 import jakarta.validation.Valid;
 import org.example.pensionat_booking.DTO.CustomerDTO;
-import org.example.pensionat_booking.Service.CustomerService;
+import org.example.pensionat_booking.Service.CustomerServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -15,10 +15,10 @@ import java.util.List;
 @RequestMapping("/api/customers")
 public class CustomerController {
 
-    private final CustomerService service;
+    private final CustomerServiceClient service;
     private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
 
-    public CustomerController(CustomerService service) {
+    public CustomerController(CustomerServiceClient service) {
         this.service = service;
     }
 
@@ -35,10 +35,14 @@ public class CustomerController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<CustomerDTO> registerCustomers(@Valid @RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<?> registerCustomers(@Valid @RequestBody CustomerDTO customerDTO) {
         log.info("POST request to register customer");
-        log.info("Customer {} registered successfully", customerDTO.getName());
-        return service.registerCustomer(customerDTO);
+        try {
+            return service.registerCustomer(customerDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
     }
 
     @DeleteMapping("/delete/{id}")
@@ -47,7 +51,7 @@ public class CustomerController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity <CustomerDTO> editCustomer(@RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<CustomerDTO> editCustomer(@RequestBody CustomerDTO customerDTO) {
         return service.editById(customerDTO);
     }
 
