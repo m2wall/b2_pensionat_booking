@@ -16,12 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
-public class CustomerService {
+public class CustomerServiceClient {
     private final BookingRepository bookingRepo;
     private final RestTemplate restTemplate;
     String baseUrl;
 
-    public CustomerService(BookingRepository bookingRepo, RestTemplate restTemplate, @Value("${customer-service.base-url}") String baseUrl) {
+    public CustomerServiceClient(BookingRepository bookingRepo, RestTemplate restTemplate, @Value("${customer-service.base-url}") String baseUrl) {
         this.bookingRepo = bookingRepo;
         this.restTemplate = restTemplate;
         this.baseUrl = baseUrl;

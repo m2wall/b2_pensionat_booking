@@ -2,14 +2,12 @@ package org.example.pensionat_booking.Controller;
 
 import jakarta.validation.Valid;
 import org.example.pensionat_booking.DTO.CustomerDTO;
-import org.example.pensionat_booking.Service.CustomerService;
+import org.example.pensionat_booking.Service.CustomerServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -17,10 +15,10 @@ import java.util.List;
 @RequestMapping("/api/customers")
 public class CustomerController {
 
-    private final CustomerService service;
+    private final CustomerServiceClient service;
     private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
 
-    public CustomerController(CustomerService service) {
+    public CustomerController(CustomerServiceClient service) {
         this.service = service;
     }
 

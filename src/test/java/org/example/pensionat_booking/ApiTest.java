@@ -6,7 +6,7 @@ import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Model.Room;
 import org.example.pensionat_booking.Repository.BookingRepository;
 import org.example.pensionat_booking.Repository.RoomRepository;
-import org.example.pensionat_booking.Service.CustomerService;
+import org.example.pensionat_booking.Service.CustomerServiceClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +17,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,7 +35,7 @@ public class ApiTest extends MySQLTestContainer {
     MockMvc mvc;
 
     @MockitoBean
-    CustomerService customerService;
+    CustomerServiceClient customerServiceClient;
 
     @Autowired
     private BookingRepository bookingRepo;
@@ -117,7 +114,7 @@ public class ApiTest extends MySQLTestContainer {
 
     @Test
     void createAndGetCustomer() throws Exception {
-        when(customerService.registerCustomer(any()))
+        when(customerServiceClient.registerCustomer(any()))
                 .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(new CustomerDTO(1L, "Testman", "test@email.com", "076076")));
 
         mvc.perform(post("/api/customers/register")

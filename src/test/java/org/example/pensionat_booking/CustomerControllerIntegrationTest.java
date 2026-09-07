@@ -30,9 +30,9 @@ public class CustomerControllerIntegrationTest extends MySQLTestContainer {
     @Autowired
     MockMvc mvc;
 
-
     @Autowired
     RestTemplate restTemplate;
+
 
     @Autowired
     private BookingRepository bookingRepo;
@@ -95,8 +95,6 @@ public class CustomerControllerIntegrationTest extends MySQLTestContainer {
                         .content("{\"name\":\"Testman\",\"email\":\"test@email.com\",\"phone\":\"076076\"}"))
                 .andExpect(status().isCreated());
 
-
-
     }
 
     @Test
@@ -115,7 +113,6 @@ public class CustomerControllerIntegrationTest extends MySQLTestContainer {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Testman\",\"email\":\"test@email.com\",\"phone\":\"076076\"}"))
                 .andExpect(status().isBadRequest());
-
 
 
     }
