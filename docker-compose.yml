@@ -42,7 +42,7 @@ services:
     depends_on:
       - booking-db
 
-  review-service:
+  reviews-service:
     build: ../b2_pensionat_reviews
     environment:
       SPRING_PROFILES_ACTIVE: prod
