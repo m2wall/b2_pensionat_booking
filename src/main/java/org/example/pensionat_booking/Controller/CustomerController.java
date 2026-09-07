@@ -5,8 +5,10 @@ import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.Service.CustomerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -40,8 +42,9 @@ public class CustomerController {
         try {
             return service.registerCustomer(customerDTO);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+
     }
 
     @DeleteMapping("/delete/{id}")

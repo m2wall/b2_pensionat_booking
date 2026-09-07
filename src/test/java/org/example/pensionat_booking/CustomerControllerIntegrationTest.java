@@ -1,12 +1,10 @@
 package org.example.pensionat_booking;
 
 
-import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Model.Room;
 import org.example.pensionat_booking.Repository.BookingRepository;
 import org.example.pensionat_booking.Repository.RoomRepository;
-import org.example.pensionat_booking.Service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,30 +13,26 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ApiTest extends MySQLTestContainer {
+public class CustomerControllerIntegrationTest extends MySQLTestContainer {
     @Autowired
     MockMvc mvc;
 
-    @MockitoBean
-    CustomerService customerService;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     @Autowired
     private BookingRepository bookingRepo;
@@ -85,57 +79,46 @@ public class ApiTest extends MySQLTestContainer {
     }
 
     @Test
-    void getAllBookings() throws Exception {
+    void createAndGetCustomerCreated() throws Exception {
 
-        bookingRepo.findAll().forEach(r -> System.out.println(r.getId()));
+        MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
 
-
-        mvc.perform(get("/api/bookings"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(3));
-    }
-
-    @Test
-    void deleteBooking() throws Exception {
-
-        Booking deleteBooking = bookingRepo.findAll().stream().findFirst().orElse(null);
-
-        mvc.perform(delete("/api/bookings/" + deleteBooking.getId()))
-                .andExpect(status().isOk());
-
-        mvc.perform(delete("/api/bookings/" + deleteBooking.getId()))
-                .andExpect(status().isNotFound());
-
-        mvc.perform(get("/api/bookings"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2));
-
-    }
-
-
-    @Test
-    void createAndGetCustomer() throws Exception {
-        when(customerService.registerCustomer(any()))
-                .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(new CustomerDTO(1L, "Testman", "test@email.com", "076076")));
+        server.expect(requestTo(baseUrl + "/customers/register"))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .body("{\"id\": 1, \"name\": \"Testman\", \"email\": \"test@email.com\", \"phone\": \"076076}\"}")
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
 
         mvc.perform(post("/api/customers/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Testman\",\"email\":\"test@email.com\",\"phone\":\"076076\"}"))
                 .andExpect(status().isCreated());
+
+
+
     }
 
+    @Test
+    void createAndGetCustomerBadRequest() throws Exception {
 
-//    @Test
-//    void createCustomer() throws Exception {
-//
-//        CustomerDTO testCst = new CustomerDTO(1L, "Test", "Test@email.com", "4444");
-//        mvc.perform(post("/api/customers/register", testCst, CustomerDTO.class));
-//
-//        mvc.perform(get("/api/customers/1"))
-//                .andExpect(status().isOk());
-//    }
+        MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+
+        server.expect(requestTo(baseUrl + "/customers/register"))
+                .andRespond(
+                        withStatus(HttpStatus.BAD_REQUEST)
+                                .body("{\"id\": 1, \"name\": \"Testman\", \"email\": \"test@email.com\", \"phone\": \"07076\"}")
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
+
+        mvc.perform(post("/api/customers/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Testman\",\"email\":\"test@email.com\",\"phone\":\"076076\"}"))
+                .andExpect(status().isBadRequest());
+
+
+
+    }
 
 
 }

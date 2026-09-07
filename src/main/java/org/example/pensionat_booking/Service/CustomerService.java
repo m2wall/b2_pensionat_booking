@@ -17,13 +17,13 @@ import java.util.List;
 
 @Service
 public class CustomerService {
-
     private final BookingRepository bookingRepo;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     String baseUrl;
 
-    public CustomerService(BookingRepository bookingRepo, @Value("${customer-service.base-url}") String baseUrl) {
+    public CustomerService(BookingRepository bookingRepo, RestTemplate restTemplate, @Value("${customer-service.base-url}") String baseUrl) {
         this.bookingRepo = bookingRepo;
+        this.restTemplate = restTemplate;
         this.baseUrl = baseUrl;
     }
 
@@ -41,10 +41,12 @@ public class CustomerService {
 
         CustomerDTO savedCst = new CustomerDTO();
         try {
-            savedCst = restTemplate.postForObject(baseUrl + "/customers/registe", inputCustomer, CustomerDTO.class);
+            savedCst = restTemplate.postForObject(baseUrl + "/customers/register", inputCustomer, CustomerDTO.class);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedCst);
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(savedCst);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
