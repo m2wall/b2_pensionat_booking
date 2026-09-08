@@ -1,5 +1,6 @@
 package org.example.pensionat_booking.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Repository.BookingRepository;
@@ -10,11 +11,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class CustomerServiceClient {
     private final BookingRepository bookingRepo;
@@ -68,16 +71,12 @@ public class CustomerServiceClient {
 
     public ResponseEntity<CustomerDTO> getCustomerById(Long id) {
 
-        CustomerDTO customerByID = new CustomerDTO();
+        CustomerDTO customerByID;
 
         try {
             customerByID = restTemplate.getForObject(baseUrl + "/customers/{id}", CustomerDTO.class, id);
         } catch (HttpClientErrorException.NotFound e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(customerByID);
-        } catch (HttpClientErrorException.BadRequest e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(customerByID);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.status(HttpStatus.OK).body(customerByID);
     }
@@ -96,7 +95,7 @@ public class CustomerServiceClient {
         } catch (HttpClientErrorException.NotFound e) {
             return "Kund hittades ej.";
         } catch (HttpClientErrorException.BadRequest e) {
-           return "Inte tillgängligt.";
+            return "Inte tillgängligt.";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -106,11 +105,7 @@ public class CustomerServiceClient {
     public ResponseEntity<CustomerDTO> editById(CustomerDTO editedCustomer) {
 
         try {
-            CustomerDTO editedCst = restTemplate.exchange(baseUrl + "/customers/editCst",
-                    HttpMethod.PUT,
-                    new HttpEntity<>(editedCustomer),
-                    CustomerDTO.class
-            ).getBody();
+            CustomerDTO editedCst = restTemplate.exchange(baseUrl + "/customers/editCst", HttpMethod.PUT, new HttpEntity<>(editedCustomer), CustomerDTO.class).getBody();
             return ResponseEntity.status(HttpStatus.OK).body(editedCst);
 
         } catch (HttpClientErrorException.NotFound e) {
