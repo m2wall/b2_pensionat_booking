@@ -191,10 +191,8 @@ public class BookingService {
 
     public void removeBooking(Long bookingID) {
         if (!bookingRepo.existsById(bookingID)) {
-            System.out.println("ROFL");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bokningen hittades ej.");
         }
-        System.out.println("LOLOLOLOL");
         bookingRepo.deleteById(bookingID);
     }
 
