@@ -40,26 +40,25 @@ public class BookingService {
     public List<BookingResponseDTO> getAllBookings() {
 
         Map<Long, String> customerName;
-
         List<Booking> bookings = bookingRepo.findAll();
         List<Long> customerIds = bookings.stream().map(b -> b.getCustomerId()).distinct().toList();
 
         try {
             customerName = customerIds.stream().collect(Collectors.toMap(id -> id, id -> customerServiceClient.getCustomerNameById(id)));
-
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage());
         }
+
         return bookings.stream().
-                        map(b -> new BookingResponseDTO(
-                                b.getId(),
-                                b.getRoom(),
-                                b.getStartDate(),
-                                b.getEndDate(),
-                                b.getRoom().isDoubleRoom(),
-                                b.getCustomerId(),
-                                customerName.get(b.getCustomerId()),
-                                b.getExtraBeds())).toList();
+                map(b -> new BookingResponseDTO(
+                        b.getId(),
+                        b.getRoom(),
+                        b.getStartDate(),
+                        b.getEndDate(),
+                        b.getRoom().isDoubleRoom(),
+                        b.getCustomerId(),
+                        customerName.get(b.getCustomerId()),
+                        b.getExtraBeds())).toList();
     }
 
     public BookingDTO BookingToBookingDTO(Booking b) {
@@ -120,6 +119,9 @@ public class BookingService {
 
     public BookingDTO createBooking(String startDate, String endDate, boolean isDoubleRoom, Long customerId, int extraBeds) {
 
+        if (extraBeds > 2) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Max 2 extrasängar.");
+
+        CustomerDTO    currentCustomer = customerServiceClient.getCustomerById(customerId).getBody();
         if (!canParseDate(startDate) && !canParseDate(endDate)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Måste ange både slut och startdatum.");
         }
@@ -137,7 +139,6 @@ public class BookingService {
         }
 
         Room room = roomRepo.findById(availableRooms.getFirst().getId()).orElse(null);
-        CustomerDTO currentCustomer = customerServiceClient.getCustomerById(customerId).getBody();
 
         Booking currentBooking = new Booking(room, currentCustomer.getId(), requestedStartDate, requestedEndDate);
         currentBooking.setExtraBeds(extraBeds);
