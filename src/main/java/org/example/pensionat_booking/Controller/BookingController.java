@@ -93,11 +93,6 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("En konflikt har inträffat.");
         }
     }
-//
-//    @GetMapping("/customer/{customerId}/exists")
-//    public boolean customerHasBookings(@PathVariable Long customerId) {
-//        return bookingService.customerHasBookings(customerId);
-//    }
 }
 
 

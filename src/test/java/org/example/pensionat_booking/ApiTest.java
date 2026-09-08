@@ -1,12 +1,10 @@
 package org.example.pensionat_booking;
 
 
-import org.example.pensionat_booking.DTO.CustomerDTO;
 import org.example.pensionat_booking.Model.Booking;
 import org.example.pensionat_booking.Model.Room;
 import org.example.pensionat_booking.Repository.BookingRepository;
 import org.example.pensionat_booking.Repository.RoomRepository;
-import org.example.pensionat_booking.Service.CustomerServiceClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +13,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,8 +33,8 @@ public class ApiTest extends MySQLTestContainer {
     @Autowired
     MockMvc mvc;
 
-    @MockitoBean
-    CustomerServiceClient customerServiceClient;
+    @Autowired
+    RestTemplate restTemplate;
 
     @Autowired
     private BookingRepository bookingRepo;
@@ -76,15 +75,32 @@ public class ApiTest extends MySQLTestContainer {
         Booking book2 = bookingRepo.save(new Booking(r4, 2L, d3, d4));
         Booking book3 = bookingRepo.save(new Booking(r8, 3L, d5, d6));
 
-        System.out.println(book1.getId() + " " + book2.getId() + " " + book3.getId());
-
 
     }
 
     @Test
     void getAllBookings() throws Exception {
 
-        bookingRepo.findAll().forEach(r -> System.out.println(r.getId()));
+        MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+
+        server.expect(requestTo(baseUrl + "/customers/1"))
+                .andRespond(
+                        withStatus(HttpStatus.OK)
+                                .body("{\"id\": 1, \"name\": \"Melvin\", \"email\": \"melvin@email.com\", \"phone\": \"070123456}\"}")
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
+        server.expect(requestTo(baseUrl + "/customers/2"))
+                .andRespond(
+                        withStatus(HttpStatus.OK)
+                                .body("{\"id\": 2, \"name\": \"Tim\", \"email\": \"tim@email.com\", \"phone\": \"070123456}\"}")
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
+        server.expect(requestTo(baseUrl + "/customers/3"))
+                .andRespond(
+                        withStatus(HttpStatus.OK)
+                                .body("{\"id\": 3, \"name\": \"Mikael\", \"email\": \"mikael@email.com\", \"phone\": \"070123456}\"}")
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
 
 
         mvc.perform(get("/api/bookings"))
@@ -104,35 +120,30 @@ public class ApiTest extends MySQLTestContainer {
         mvc.perform(delete("/api/bookings/" + deleteBooking.getId()))
                 .andExpect(status().isNotFound());
 
-        mvc.perform(get("/api/bookings"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2));
+        List<Booking> bookings = bookingRepo.findAll();
+
+        assertEquals(2, bookings.size());
 
     }
 
-
     @Test
-    void createAndGetCustomer() throws Exception {
-        when(customerServiceClient.registerCustomer(any()))
-                .thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(new CustomerDTO(1L, "Testman", "test@email.com", "076076")));
+    void createAndGetCustomerCreated() throws Exception {
+
+        MockRestServiceServer server = MockRestServiceServer.createServer(restTemplate);
+
+        server.expect(requestTo(baseUrl + "/customers/register"))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .body("{\"id\": 1, \"name\": \"Testman\", \"email\": \"test@email.com\", \"phone\": \"076076}\"}")
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
 
         mvc.perform(post("/api/customers/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Testman\",\"email\":\"test@email.com\",\"phone\":\"076076\"}"))
                 .andExpect(status().isCreated());
+
     }
-
-
-//    @Test
-//    void createCustomer() throws Exception {
-//
-//        CustomerDTO testCst = new CustomerDTO(1L, "Test", "Test@email.com", "4444");
-//        mvc.perform(post("/api/customers/register", testCst, CustomerDTO.class));
-//
-//        mvc.perform(get("/api/customers/1"))
-//                .andExpect(status().isOk());
-//    }
 
 
 }
