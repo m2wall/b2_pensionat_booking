@@ -59,6 +59,7 @@
       try {
         await Api.postJson("/api/customers/register", data, {
           400: "Kunde inte registrera kunden. Kontrollera att namn, e-post och telefonnummer är korrekt ifyllda.",
+          500: "Tjänsten för kunder kan ej nås just nu.",
         });
         window.location.href = "/customers.html";
       } catch (err) {

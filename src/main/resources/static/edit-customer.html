@@ -64,6 +64,7 @@
         const customer = await Api.get(`/api/customers/${id}`, {
           404: "Kunden hittades inte.",
           400: "Ogiltigt kund-id.",
+          500: "Tjänsten för kunder kan ej nås just nu.",
         });
         form.id.value = customer.id;
         form.name.value = customer.name;
@@ -82,6 +83,7 @@
         await Api.putJson("/api/customers/edit", data, {
           404: "Kunden hittades inte, det gick inte att spara.",
           400: "Ogiltiga uppgifter, det gick inte att spara.",
+          500: "Tjänsten för kunder kan ej nås just nu.",
         });
         window.location.href = "/customers.html";
       } catch (err) {

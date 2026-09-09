@@ -66,7 +66,7 @@
 
     async function loadRooms() {
       try {
-        const rooms = await Api.get("/api/rooms", { 500: "Kunde inte hämta rumslistan just nu." });
+        const rooms = await Api.get("/api/rooms", { 500: "Tjänsten för rum kan ej nås just nu." });
         roomSelect.innerHTML =
           `<option value="">Välj rum...</option>` +
           rooms
@@ -96,7 +96,7 @@
           },
           {
             400: "Kunde inte skicka recensionen. Kontrollera uppgifterna.",
-            500: "Kunde inte skicka recensionen just nu.",
+            500: "Tjänsten för recensioner kan ej nås just nu.",
           }
         );
         form.reset();

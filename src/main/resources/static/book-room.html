@@ -82,9 +82,7 @@
 
     async function loadCustomers() {
         try {
-            const customers = await Api.get("/api/customers", {
-                500: "Kan inte nå kundmikrotjänsten just nu. Kontrollera att den körs.",
-            });
+            const customers = await Api.get("/api/customers", { 500: "Tjänsten för kunder kan ej nås just nu." });
             customerSelect.innerHTML =
                 `<option value="">Välj kund...</option>` +
                 customers.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
@@ -113,7 +111,7 @@
                 `/api/bookings/available-rooms?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&doubleRoom=${isDoubleRoom}`,
                 {
                     400: "Ogiltiga datum. Kontrollera att startdatum är före slutdatum.",
-                    500: "Kunde inte söka lediga rum. Kontrollera datumen."
+                    500: "Tjänsten för bokningar kan ej nås just nu.",
                 }
             );
 
@@ -168,7 +166,7 @@
                     extraBeds,
                     customerId: lastSearch.customerId,
                 },
-                {500: "Kunde inte skapa bokningen. Rummet kan ha blivit bokat under tiden."}
+                { 500: "Tjänsten för bokningar kan ej nås just nu." }
             );
             window.location.href = "/bookings.html";
         } catch (err) {
