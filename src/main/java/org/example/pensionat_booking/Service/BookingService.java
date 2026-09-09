@@ -43,11 +43,14 @@ public class BookingService {
         List<Booking> bookings = bookingRepo.findAll();
         List<Long> customerIds = bookings.stream().map(b -> b.getCustomerId()).distinct().toList();
 
-        try {
-            customerName = customerIds.stream().collect(Collectors.toMap(id -> id, id -> customerServiceClient.getCustomerNameById(id)));
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+
+        customerName = customerIds.stream().collect(Collectors.toMap(id -> id, id -> {
+            try {
+                return customerServiceClient.getCustomerNameById(id);
+            } catch (RuntimeException e) {
+                return "Ej tillgänligt";
+            }
+        }));
 
         return bookings.stream().
                 map(b -> new BookingResponseDTO(
@@ -117,11 +120,12 @@ public class BookingService {
         return validRooms.stream().map(room -> RoomDTO.builder().id(room.getId()).nr(room.getNr()).isDoubleRoom(room.isDoubleRoom()).build()).toList();
     }
 
-    public BookingDTO createBooking(String startDate, String endDate, boolean isDoubleRoom, Long customerId, int extraBeds) {
+    public BookingDTO createBooking(String startDate, String endDate, boolean isDoubleRoom, Long customerId,
+                                    int extraBeds) {
 
         if (extraBeds > 2) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Max 2 extrasängar.");
 
-        CustomerDTO    currentCustomer = customerServiceClient.getCustomerById(customerId).getBody();
+        CustomerDTO currentCustomer = customerServiceClient.getCustomerById(customerId).getBody();
         if (!canParseDate(startDate) && !canParseDate(endDate)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Måste ange både slut och startdatum.");
         }
