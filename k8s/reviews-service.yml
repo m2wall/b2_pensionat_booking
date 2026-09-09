@@ -17,7 +17,21 @@ spec:
           image: reviews-service
           imagePullPolicy: Never
           ports:
-            - containerPort: 8082
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: DB_HOST
+              value: "reviews-db"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "pensionat_reviews"
+            - name: DB_USER
+              value: "reviews_user"
+            - name: DB_PASSWORD
+              value: "reviews_password"
+
 
 ---
 
@@ -29,5 +43,5 @@ spec:
   selector:
     app: reviews-service
   ports:
-    - port: 8082
-      targetPort: 8082
+    - port: 8080
+      targetPort: 8080
