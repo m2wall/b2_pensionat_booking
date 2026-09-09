@@ -17,7 +17,20 @@ spec:
           image: customer-service
           imagePullPolicy: Never
           ports:
-            - containerPort: 8081
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: DB_HOST
+              value: "customer-db"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "pensionat_customer"
+            - name: DB_USER
+              value: "customer_user"
+            - name: DB_PASSWORD
+              value: "customer_password"
 
 ---
 
@@ -29,7 +42,7 @@ spec:
   selector:
     app: customer-service
   ports:
-    - port: 8081
-      targetPort: 8081
+    - port: 8080
+      targetPort: 8080
 
 

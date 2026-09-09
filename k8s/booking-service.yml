@@ -18,6 +18,20 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: DB_HOST
+              value: "booking-db"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "pensionat_booking"
+            - name: DB_USER
+              value: "booking_user"
+            - name: DB_PASSWORD
+              value: "booking_password"
+
 
 ---
 
