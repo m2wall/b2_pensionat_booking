@@ -2,6 +2,13 @@
 // All requests are relative, so this must be served by the same
 // Spring Boot app that exposes /api/... (static/ folder on the same origin).
 
+// User-facing fallback text. Kept low-key and specific to what's affected —
+// never phrased as "the system/microservice is down", just "not available
+// right now", the same tone as the inline "Ej tillgänglig" labels.
+const CUSTOMER_UNAVAILABLE_MESSAGE = "Tjänsten för kunder kan ej nås just nu.";
+const REVIEW_UNAVAILABLE_MESSAGE = "Tjänsten för recensioner kan ej nås just nu.";
+const GENERIC_UNAVAILABLE_MESSAGE = "Kan inte hämta informationen just nu. Försök igen senare.";
+
 // Turns raw backend/network error text into a readable Swedish message.
 // Returns null when the text doesn't match a known pattern, so a real
 // backend message (e.g. "Inga rum tillgängliga.") can still be shown as-is.
@@ -16,11 +23,30 @@ function friendlyErrorMessage(rawMessage) {
     msg.includes("connect timed out") ||
     msg.includes("resourceaccessexception")
   ) {
-    return "Kan inte nå kundmikrotjänsten just nu. Kontrollera att den körs och försök igen.";
+    return CUSTOMER_UNAVAILABLE_MESSAGE;
+  }
+
+  // Booking's own backend produces this vague message when the reviews
+  // service specifically can't be reached.
+  if (msg.includes("något gick fel")) {
+    return REVIEW_UNAVAILABLE_MESSAGE;
+  }
+
+  // Spring Boot's default Whitelabel error body for 5xx responses leaks
+  // this text verbatim when a service has no custom error handling. The
+  // origin isn't identifiable from the text alone, so fall back to a
+  // generic (still low-key) message rather than guessing.
+  if (
+    msg.includes("internal server error") ||
+    msg.includes("bad gateway") ||
+    msg.includes("service unavailable") ||
+    msg.includes("gateway timeout")
+  ) {
+    return GENERIC_UNAVAILABLE_MESSAGE;
   }
 
   if (msg.includes("failed to fetch") || msg.includes("networkerror") || msg.includes("load failed")) {
-    return "Kan inte nå servern. Kontrollera att applikationen körs och att du har anslutning.";
+    return "Kan inte nå appen just nu. Försök igen senare.";
   }
 
   return null;
@@ -50,6 +76,7 @@ function extractBackendMessage(body, isJson) {
 }
 
 function defaultStatusMessage(status) {
+  if (status >= 500) return GENERIC_UNAVAILABLE_MESSAGE;
   switch (status) {
     case 400:
       return "Ogiltig förfrågan. Kontrollera uppgifterna du skickade in.";
@@ -57,8 +84,6 @@ function defaultStatusMessage(status) {
       return "Hittades inte.";
     case 409:
       return "Kunde inte genomföras eftersom det skulle skapa en konflikt.";
-    case 500:
-      return "Ett oväntat fel inträffade på servern.";
     default:
       return `Anropet misslyckades (status ${status}).`;
   }
@@ -74,7 +99,7 @@ const Api = {
       res = await fetch(url, options);
     } catch (networkErr) {
       const err = new Error(
-        friendlyErrorMessage(networkErr.message) || "Kan inte nå servern. Kontrollera att applikationen körs."
+        friendlyErrorMessage(networkErr.message) || "Kan inte nå appen just nu. Försök igen senare."
       );
       err.status = 0;
       throw err;

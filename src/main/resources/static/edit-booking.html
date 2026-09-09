@@ -62,7 +62,7 @@
         return;
       }
       try {
-        const bookings = await Api.get("/api/bookings", { 500: "Kunde inte hämta bokningen." });
+        const bookings = await Api.get("/api/bookings", { 500: "Tjänsten för bokningar kan ej nås just nu." });
         const booking = bookings.find(b => String(b.id) === String(id));
         if (!booking) {
           showAlert(alertBox, "Hittade ingen bokning med det id:t.");
@@ -88,7 +88,7 @@
             startDate: form.startDate.value,
             endDate: form.endDate.value,
           },
-          { 500: "Kunde inte spara ändringarna. Rummet kan vara upptaget under de nya datumen." }
+          { 500: "Tjänsten för bokningar kan ej nås just nu." }
         );
         window.location.href = "/bookings.html";
       } catch (err) {

@@ -46,7 +46,7 @@
       try {
         const customers = await Api.get("/api/customers", {
           400: "Kunde inte hämta kundlistan just nu.",
-          500: "Kan inte nå kundmikrotjänsten just nu. Kontrollera att den körs.",
+          500: "Tjänsten för kunder kan ej nås just nu.",
         });
         count.textContent = `${customers.length} kund${customers.length === 1 ? "" : "er"}`;
 
