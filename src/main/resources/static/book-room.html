@@ -43,9 +43,9 @@
             <input type="checkbox" name="isDoubleRoom" id="doubleRoomCheckbox"/>
             Dubbelrum
         </label>
-        <label id="extraBedsLabel" hidden>
+        <label id="extraBedsLabel">
             Extrasängar
-            <input type="number" name="extraBeds" id="extraBeds" min="0" max="2" value="0"/>
+            <input type="number" name="extraBeds" id="extraBeds" min="0" max="2" value="0" disabled/>
         </label>
         <label>
             Kund
@@ -71,11 +71,10 @@
     const resultsWrap = document.getElementById("resultsWrap");
     const customerSelect = searchForm.customerId;
     const doubleRoomCheckbox = document.getElementById("doubleRoomCheckbox");
-    const extraBedsLabel = document.getElementById("extraBedsLabel");
     const extraBedsInput = document.getElementById("extraBeds");
 
     doubleRoomCheckbox.addEventListener("change", () => {
-        extraBedsLabel.hidden = !doubleRoomCheckbox.checked;
+        extraBedsInput.disabled = !doubleRoomCheckbox.checked;
         if (!doubleRoomCheckbox.checked) extraBedsInput.value = 0;
     });
 
@@ -157,14 +156,16 @@
     // so any "Boka" button in the results uses the same search criteria.
     async function bookSelectedRoom() {
         if (!lastSearch) return;
+        const isDoubleRoom = doubleRoomCheckbox.checked;
+        const extraBeds = isDoubleRoom ? Number(extraBedsInput.value || 0) : 0;
         try {
             await Api.post(
                 "/api/bookings",
                 {
                     startDate: lastSearch.startDate,
                     endDate: lastSearch.endDate,
-                    isDoubleRoom: lastSearch.isDoubleRoom,
-                    extraBeds: lastSearch.extraBeds,
+                    isDoubleRoom,
+                    extraBeds,
                     customerId: lastSearch.customerId,
                 },
                 {500: "Kunde inte skapa bokningen. Rummet kan ha blivit bokat under tiden."}
