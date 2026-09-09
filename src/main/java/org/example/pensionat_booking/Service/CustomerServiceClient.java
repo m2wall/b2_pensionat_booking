@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,12 +22,13 @@ public class CustomerServiceClient {
     private final BookingRepository bookingRepo;
 
     private final RestTemplate restTemplate;
+
+    @Value("${customer-service.base-url}")
     String baseUrl;
 
-    public CustomerServiceClient(BookingRepository bookingRepo, RestTemplate restTemplate, @Value("${customer-service.base-url}") String baseUrl) {
+    public CustomerServiceClient(BookingRepository bookingRepo, RestTemplate restTemplate) {
         this.bookingRepo = bookingRepo;
         this.restTemplate = restTemplate;
-        this.baseUrl = baseUrl;
     }
 
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {

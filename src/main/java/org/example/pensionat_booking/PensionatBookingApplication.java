@@ -9,11 +9,26 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.beans.factory.annotation.Value;
 import java.time.LocalDate;
 
 @SpringBootApplication
 public class PensionatBookingApplication {
+
+    @Value("${DB_HOST}")
+    String dbHost;
+
+    @Value("${DB_NAME}")
+    String dbName;
+
+    @Value("${DB_PORT}")
+    String dbPort;
+
+    @Value("${customer-service.base-url}")
+    String customerBaseUrl;
+
+    @Value("${reviews-service.base-url}")
+    String reviewsBaseUrl;
 
 
     public static void main(String[] args) {
@@ -51,6 +66,19 @@ public class PensionatBookingApplication {
             bookingRepo.save(new Booking(r4, 2L, d3, d4));
             bookingRepo.save(new Booking(r8, 3L, d5, d6));
 
+
+            System.out.println("/ / / / / / / / / / / / / / / / / / / / / / / / / / / /");
+            System.out.println("DATABASE URL: " + dbHost + ":" + dbPort + "/" + dbName);
+            System.out.println("CUSTOMER BASE URL: " + customerBaseUrl);
+            System.out.println("RVIEWS BASE URL:" + reviewsBaseUrl);
+            System.out.println("/ / / / / / / / / / / / / / / / / / / / / / / / / / / /");
+
+//            spring.datasource.url=jdbc:mysql://${db_host}:${db_port}/${db_name}
+//            spring.datasource.username=${db_user}
+//            spring.datasource.password=${db_password}
+//            server.port=8080
+//            customer-service.base-url=${customer_service_url}
+//            reviews-service.base-url=${reviews_service_url}
         };
     }
 
