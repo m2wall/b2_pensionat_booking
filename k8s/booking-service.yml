@@ -31,6 +31,10 @@ spec:
               value: "booking_user"
             - name: DB_PASSWORD
               value: "booking_password"
+            - name: CUSTOMER_SERVICE_URL
+              value: http://customer-service:8080/
+            - name: REVIEWS_SERVICE_URL
+              value: http://reviews-service:8080/
 
 
 ---

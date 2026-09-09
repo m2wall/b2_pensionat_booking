@@ -23,7 +23,7 @@ spec:
             - name: MYSQL_PASSWORD
               value: booking_password
             - name: MYSQL_DATABASE
-              value: pensionat_db
+              value: pensionat_booking
           ports:
             - containerPort: 3306
 
