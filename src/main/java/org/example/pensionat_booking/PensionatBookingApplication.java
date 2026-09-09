@@ -15,21 +15,21 @@ import java.time.LocalDate;
 @SpringBootApplication
 public class PensionatBookingApplication {
 
-    @Value("${DB_HOST}")
-    String dbHost;
-
-    @Value("${DB_NAME}")
-    String dbName;
-
-    @Value("${DB_PORT}")
-    String dbPort;
-
-    @Value("${customer-service.base-url}")
-    String customerBaseUrl;
-
-    @Value("${reviews-service.base-url}")
-    String reviewsBaseUrl;
-
+//    @Value("${DB_HOST}")
+//    String dbHost;
+//
+//    @Value("${DB_NAME}")
+//    String dbName;
+//
+//    @Value("${DB_PORT}")
+//    String dbPort;
+//
+//    @Value("${customer-service.base-url}")
+//    String customerBaseUrl;
+//
+//    @Value("${reviews-service.base-url}")
+//    String reviewsBaseUrl;
+//
 
     public static void main(String[] args) {
         SpringApplication.run(PensionatBookingApplication.class, args);
@@ -67,11 +67,11 @@ public class PensionatBookingApplication {
             bookingRepo.save(new Booking(r8, 3L, d5, d6));
 
 
-            System.out.println("/ / / / / / / / / / / / / / / / / / / / / / / / / / / /");
-            System.out.println("DATABASE URL: " + dbHost + ":" + dbPort + "/" + dbName);
-            System.out.println("CUSTOMER BASE URL: " + customerBaseUrl);
-            System.out.println("RVIEWS BASE URL:" + reviewsBaseUrl);
-            System.out.println("/ / / / / / / / / / / / / / / / / / / / / / / / / / / /");
+//            System.out.println("/ / / / / / / / / / / / / / / / / / / / / / / / / / / /");
+//            System.out.println("DATABASE URL: " + dbHost + ":" + dbPort + "/" + dbName);
+//            System.out.println("CUSTOMER BASE URL: " + customerBaseUrl);
+//            System.out.println("RVIEWS BASE URL:" + reviewsBaseUrl);
+//            System.out.println("/ / / / / / / / / / / / / / / / / / / / / / / / / / / /");
 
 //            spring.datasource.url=jdbc:mysql://${db_host}:${db_port}/${db_name}
 //            spring.datasource.username=${db_user}
