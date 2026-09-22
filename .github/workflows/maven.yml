@@ -43,7 +43,7 @@ jobs:
 
     - name: Build with Maven
       run: mvn test
-:w
+
     - name: Build with Maven
       run: mvn -B package -DskipTests
 
