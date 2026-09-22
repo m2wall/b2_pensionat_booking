@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        java: [17,21]
+        java: [25]
 
 
     services:
@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up JDK 17
+    - name: Set up JDK 25
       uses: actions/setup-java@v4
       with:
         java-version: ${{matrix.java}}
@@ -43,7 +43,7 @@ jobs:
 
     - name: Build with Maven
       run: mvn test
-
+:w
     - name: Build with Maven
       run: mvn -B package -DskipTests
 
