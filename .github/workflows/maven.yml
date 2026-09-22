@@ -48,11 +48,12 @@ jobs:
       run: mvn -B package -DskipTests
 
     - name: Login to Dockerhub
+      if: github.event_name == "push"
       run: echo "${{secrets.DOCKERHUB_TOKEN}}" | docker login -u "${{secrets.DOCKERHUB_USERNAME}}" --password-stdin
 
     - name: Docker build
       run: |
-        build -t ${{secrets.DOCKERHUB_USERNAME}}/booking-service:${{github.run_number}} .
+        docker build -t ${{secrets.DOCKERHUB_USERNAME}}/booking-service:${{github.run_number}} .
 
     - name: Push to dockerhub
       run: |
