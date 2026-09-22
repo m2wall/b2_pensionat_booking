@@ -48,7 +48,7 @@ jobs:
       run: mvn -B package -DskipTests
 
     - name: Login to Dockerhub
-      if: github.event_name == "push"
+      if: github.event_name == 'push'
       run: echo "${{secrets.DOCKERHUB_TOKEN}}" | docker login -u "${{secrets.DOCKERHUB_USERNAME}}" --password-stdin
 
     - name: Docker build
