@@ -41,27 +41,22 @@ jobs:
         cache: maven
 
 
-    - name: starta hela systemet med docker
-      run: docker compose up -d --build
-
-    - name: vänta på att allt ska startas
-      run: sleep 20
-
-    - name: anrop mot ett av våra endpoints
-      run: curl -f http://localhost:8080/customer/1
-
-    - name: tear everything down
-      if: always()
-      run: docker compose down -v
-
-
-
     - name: Build with Maven
       run: mvn test
 
     - name: Build with Maven
       run: mvn -B package -DskipTests
 
+    - name: Login to Dockerhub
+      run: echo "${{secrets.DOCKERHUB_TOKEN}}" | docker login -u "${{secrets.DOCKERHUB_USERNAME}}" --password-stdin
+
+    - name: Docker build
+      run: |
+        build -t ${{secrets.DOCKERHUB_USERNAME}}/booking-service:${{github.run_number}} .
+
+    - name: Push to dockerhub
+      run: |
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/booking-service:${{github.run_number}}
 
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/customerdb
